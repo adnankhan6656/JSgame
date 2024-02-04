@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        td {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Timer: <span id="timer">10</span> seconds</h2>
+    <h2>Score: <span id="score">0</span></h2>
+    <table id="mytable" border="2">
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <script>
+        var table = document.getElementById("mytable");
+        var lowOpacityCell = null;
+        var score = 0;
+        var timer = 10; // Initial value for the timer
+        var timerInterval;
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function addRowAndColumn() {
+            var rowCount = table.rows.length;
+            var colCount = table.rows[0].cells.length;
+
+            // Add a new row
+            var newRow = table.insertRow(rowCount);
+
+            // Add cells to the new row
+            for (var i = 0; i < colCount; i++) {
+                var newCell = newRow.insertCell(i);
+            }
+
+            // Add a new column
+            for (var i = 0; i < rowCount + 1; i++) {
+                var newCell = table.rows[i].insertCell(colCount);
+            }
+        }
+
+        function updateColors() {
+            var tds = document.querySelectorAll("td");
+            var randomColor = getRandomColor();
+
+            // Apply the same color to all cells
+            tds.forEach(function(td) {
+                td.style.backgroundColor = randomColor;
+            });
+        }
+
+        function clearLowOpacityCell() {
+            if (lowOpacityCell) {
+                lowOpacityCell.style.opacity = 1;
+            }
+        }
+
+        function chooseLowOpacityCell() {
+            var cells = document.querySelectorAll("td");
+            lowOpacityCell = cells[Math.floor(Math.random() * cells.length)];
+            lowOpacityCell.style.opacity = 0.5;
+        }
+
+        function gameClickHandler() {
+            addRowAndColumn();
+            clearLowOpacityCell();
+            chooseLowOpacityCell();
+            updateColors();
+            updateScore();
+        }
+
+        function updateScore() {
+            score++;
+            document.getElementById("score").textContent = score;
+        }
+
+        function updateTimer() {
+            timer--;
+            document.getElementById("timer").textContent = timer;
+
+            if (timer === 0) {
+                clearInterval(timerInterval);
+                alert("Game Over! Your score is: " + score);
+            }
+        }
+
+        function startGame() {
+            // Clear any existing interval
+            clearInterval(timerInterval);
+
+            // Reset variables
+            score = 0;
+            timer = 10; // Reset timer to initial value
+            document.getElementById("score").textContent = score;
+            document.getElementById("timer").textContent = timer;
+
+            // Set up new interval
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Start the game
+            updateColors();
+            chooseLowOpacityCell();
+        }
+
+        window.onload = startGame;
+    
+        // Add click event listener to the table
+        table.addEventListener("click", function(event) {
+            if (event.target.tagName === "TD" && event.target === lowOpacityCell) {
+                gameClickHandler();
+            }
+        });
+    </script>
+</body>
+</html>
